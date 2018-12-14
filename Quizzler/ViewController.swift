@@ -13,6 +13,8 @@ class ViewController: UIViewController {
     
     let allQuestions = QuestionBank()
     var pickedAnswer: Bool = false
+    var questionNumber: Int = 0
+    var score: Int = 0
     
     @IBOutlet weak var questionLabel: UILabel!
     @IBOutlet weak var scoreLabel: UILabel!
@@ -21,9 +23,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let firstQuestion = allQuestions.list[0]
-        questionLabel.text = firstQuestion.questionText
+        updateUI()
     }
 
 
@@ -38,32 +38,48 @@ class ViewController: UIViewController {
     
     
     func updateUI() {
-      
+        let question = allQuestions.list[questionNumber]
+        questionLabel.text = question.questionText
+        progressLabel.text = "\(questionNumber + 1)/13"
+        scoreLabel.text = "Score: \(score)"
+        progressBar.frame.size.width = (view.frame.size.width / 13) * CGFloat(questionNumber + 1)
     }
     
 
     func nextQuestion() {
+        questionNumber += 1
         
+        if questionNumber == 13 {
+            
+            let alert = UIAlertController(title: "Awesome", message: "You finished all the questions, do you want to start over?", preferredStyle: .alert)
+            
+            let restartAction = UIAlertAction(title: "Restart", style: .default, handler: {
+                (UIAlertAction) in self.startOver()
+            })
+            
+            alert.addAction(restartAction)
+            present(alert, animated: true, completion: nil)
+            
+        } else {
+            updateUI()
+        }
     }
     
     
     func checkAnswer() {
-        let firstQuestion = allQuestions.list[0]
+        let question = allQuestions.list[questionNumber]
         
-        if pickedAnswer == firstQuestion.answer {
-            scoreLabel.text = "1"
-            print("true")
-        } else {
-            print("false")
+        if pickedAnswer == question.answer {
+            score += 1
         }
-        
-        progressLabel.text = "1/13"
+        nextQuestion()
         
     }
     
     
     func startOver() {
-       
+        questionNumber = 0
+        updateUI()
     }
     
 
